@@ -34,6 +34,7 @@ const replaceTemplate = (temp, product) => {
     output = output.replace(/{%ID}/g, product.id);
 
     if(!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not_organic');
+    return output;
 }
 
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
@@ -49,8 +50,10 @@ const server = http.createServer((req, res) =>{
     if(pathName === '/' || pathName === '/overview') {
         res.writeHead(200, { 'Content-type': 'text/html'});
 
-        const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el));
-        res.end(tempOverview);
+        const cardsHtml = dataObj.map(el => replaceTemplate(tempCard, el)).join('');
+        const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+
+        res.end(output);
     }
 
     //PRODUCT
